@@ -8,7 +8,7 @@
 import Foundation
 
 /// Represents a connected cloud storage account
-struct CloudAccount: Identifiable, Codable, Equatable {
+struct CloudAccount: Identifiable, Codable, Equatable, Hashable {
     let id: String
     let serviceType: CloudServiceType
     let email: String
@@ -42,5 +42,10 @@ struct CloudAccount: Identifiable, Codable, Equatable {
 
     static func == (lhs: CloudAccount, rhs: CloudAccount) -> Bool {
         lhs.id == rhs.id && lhs.serviceType == rhs.serviceType
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+        hasher.combine(serviceType)
     }
 }
