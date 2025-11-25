@@ -1,0 +1,95 @@
+name: CloudFileBrowser
+
+options:
+  bundleIdPrefix: com.cloudfilebrowser
+  deploymentTarget:
+    iOS: 15.0
+  developmentLanguage: en
+  xcodeVersion: "15.0"
+
+settings:
+  base:
+    DEVELOPMENT_TEAM: ""
+    CODE_SIGN_STYLE: Automatic
+    SWIFT_VERSION: "5.9"
+    IPHONEOS_DEPLOYMENT_TARGET: 15.0
+
+packages:
+  SwiftyDropbox:
+    url: https://github.com/dropbox/SwiftyDropbox
+    version: 10.0.0
+  Alamofire:
+    url: https://github.com/Alamofire/Alamofire
+    version: 5.8.1
+
+targets:
+  CloudFileBrowser:
+    type: application
+    platform: iOS
+    deploymentTarget: "15.0"
+    sources:
+      - path: CloudFileBrowser/Sources
+      - path: CloudFileBrowser
+        includes:
+          - "*.swift"
+    resources:
+      - path: CloudFileBrowser/Resources
+      - path: CloudFileBrowser/Preview Content
+    settings:
+      base:
+        INFOPLIST_FILE: CloudFileBrowser/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: com.cloudfilebrowser.app
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        DEVELOPMENT_ASSET_PATHS: '"CloudFileBrowser/Preview Content"'
+        ENABLE_PREVIEWS: YES
+        SWIFT_VERSION: "5.9"
+        TARGETED_DEVICE_FAMILY: "1,2"
+    dependencies:
+      - package: SwiftyDropbox
+        product: SwiftyDropbox
+      - package: Alamofire
+        product: Alamofire
+    scheme:
+      testTargets:
+        - CloudFileBrowserTests
+      gatherCoverageData: true
+
+  CloudFileBrowserTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - CloudFileBrowserTests
+    dependencies:
+      - target: CloudFileBrowser
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.cloudfilebrowser.tests
+
+  CloudFileBrowserUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - CloudFileBrowserUITests
+    dependencies:
+      - target: CloudFileBrowser
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.cloudfilebrowser.uitests
+
+schemes:
+  CloudFileBrowser:
+    build:
+      targets:
+        CloudFileBrowser: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - CloudFileBrowserTests
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release
