@@ -31,7 +31,7 @@ class AccountsViewModel: ObservableObject {
         errorMessage = nil
 
         do {
-            let account = try await serviceManager.connectAccount(serviceType)
+            _ = try await serviceManager.connectAccount(serviceType)
             accounts = serviceManager.accounts
         } catch {
             errorMessage = error.localizedDescription

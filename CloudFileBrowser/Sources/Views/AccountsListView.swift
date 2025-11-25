@@ -13,57 +13,75 @@ struct AccountsListView: View {
     @State private var showAddAccount = false
 
     var body: some View {
+        accountsList
+            .navigationTitle("Cloud Files")
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    addButton
+                }
+            }
+            .sheet(isPresented: $showAddAccount) {
+                AddAccountView()
+            }
+            .alert("Error", isPresented: $accountsViewModel.showError) {
+                Button("OK") {
+                    accountsViewModel.showError = false
+                }
+            } message: {
+                errorMessage
+            }
+    }
+
+    private var accountsList: some View {
         List(selection: $selectedAccount) {
             Section {
                 ForEach(accountsViewModel.accounts) { account in
                     AccountRow(account: account)
                         .tag(account)
                         .contextMenu {
-                            Button(role: .destructive) {
-                                Task {
-                                    await accountsViewModel.disconnectAccount(account)
-                                    if selectedAccount?.id == account.id {
-                                        selectedAccount = nil
-                                    }
-                                }
-                            } label: {
-                                Label("Disconnect", systemImage: "trash")
-                            }
-
-                            Button {
-                                Task {
-                                    await accountsViewModel.refreshAccount(account)
-                                }
-                            } label: {
-                                Label("Refresh", systemImage: "arrow.clockwise")
-                            }
+                            accountContextMenu(for: account)
                         }
                 }
             } header: {
                 Text("Connected Accounts")
             }
         }
-        .navigationTitle("Cloud Files")
-        .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Button {
-                    showAddAccount = true
-                } label: {
-                    Image(systemName: "plus")
+    }
+
+    private var addButton: some View {
+        Button {
+            showAddAccount = true
+        } label: {
+            Image(systemName: "plus")
+        }
+    }
+
+    @ViewBuilder
+    private var errorMessage: some View {
+        if let error = accountsViewModel.errorMessage {
+            Text(error)
+        }
+    }
+
+    @ViewBuilder
+    private func accountContextMenu(for account: CloudAccount) -> some View {
+        Button(role: .destructive) {
+            Task {
+                await accountsViewModel.disconnectAccount(account)
+                if selectedAccount?.id == account.id {
+                    selectedAccount = nil
                 }
             }
+        } label: {
+            Label("Disconnect", systemImage: "trash")
         }
-        .sheet(isPresented: $showAddAccount) {
-            AddAccountView()
-        }
-        .alert("Error", isPresented: $accountsViewModel.showError) {
-            Button("OK") {
-                accountsViewModel.showError = false
+
+        Button {
+            Task {
+                await accountsViewModel.refreshAccount(account)
             }
-        } message: {
-            if let error = accountsViewModel.errorMessage {
-                Text(error)
-            }
+        } label: {
+            Label("Refresh", systemImage: "arrow.clockwise")
         }
     }
 }
